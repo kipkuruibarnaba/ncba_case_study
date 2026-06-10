@@ -19,6 +19,7 @@ import org.xml.sax.SAXException;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -116,7 +117,6 @@ public class CountryService {
             connection.setRequestProperty("Content-Length", String.valueOf(reqBody.length()));
 //          connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
-
             // Send SOAP request
             OutputStream os = connection.getOutputStream();
             os.write(reqBody.getBytes());
@@ -124,7 +124,6 @@ public class CountryService {
             os.close();
             // Read response
             int responseCode = connection.getResponseCode();
-
             BufferedReader in = new BufferedReader(new InputStreamReader(
                     connection.getInputStream()));
             String inputLine;
@@ -143,47 +142,35 @@ public class CountryService {
         Document document = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder()
                 .parse(new InputSource(new StringReader(xml)));
-
         XPath xpath = XPathFactory.newInstance().newXPath();
-
         String isoCode = xpath.evaluate(
                 "//*[local-name()='FullCountryInfoResult']/*[local-name()='sISOCode'][1]",
                 document);
-
         String countryName = xpath.evaluate(
                 "//*[local-name()='FullCountryInfoResult']/*[local-name()='sName'][1]",
                 document);
-
         String capitalCity = xpath.evaluate(
                 "//*[local-name()='sCapitalCity']",
                 document);
-
         String phoneCode = xpath.evaluate(
                 "//*[local-name()='sPhoneCode']",
                 document);
-
         String continentCode = xpath.evaluate(
                 "//*[local-name()='sContinentCode']",
                 document);
-
         String currencyCode = xpath.evaluate(
                 "//*[local-name()='sCurrencyISOCode']",
                 document);
-
         String flag = xpath.evaluate(
                 "//*[local-name()='sCountryFlag']",
                 document);
-
         String languageCode = xpath.evaluate(
                 "//*[local-name()='tLanguage']/*[local-name()='sISOCode']",
                 document);
-
         String languageName = xpath.evaluate(
                 "//*[local-name()='tLanguage']/*[local-name()='sName']",
                 document);
-
         JSONArray jsonArray = new JSONArray();
-
         // Add primitive values
         jsonArray.put(isoCode);
         jsonArray.put(countryName);
@@ -227,4 +214,31 @@ public class CountryService {
     };
 
 
+    public List<CountryInfo> getAllCountries() {
+        return countryRepository.findAll();
+    }
+
+    public CountryInfo getCountryById(Long id) {
+        return countryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Country not found"));
+    }
+    public CountryInfo updateCountry(Long id, CountryInfo country) {
+
+        CountryInfo existing = countryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Country not found"));
+
+        existing.setIsoCode(country.getIsoCode());
+        existing.setName(country.getName());
+        existing.setCapitalCity(country.getCapitalCity());
+        existing.setPhoneCode(country.getPhoneCode());
+        existing.setContinentCode(country.getContinentCode());
+        existing.setCurrencyCode(country.getCurrencyCode());
+        existing.setCountryFlag(country.getCountryFlag());
+
+        return countryRepository.save(existing);
+    }
+
+    public void deleteCountry(Long id) {
+        countryRepository.deleteById(id);
+    }
 }
