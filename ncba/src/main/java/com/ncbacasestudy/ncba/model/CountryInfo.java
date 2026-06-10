@@ -5,13 +5,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
+@Getter
+@Setter
 @Entity
 @Table(
         name = "Country"
@@ -22,14 +22,21 @@ public class CountryInfo {
             strategy = GenerationType.IDENTITY
     )
     private Long id;
-    @Column(name="country_name",nullable = false)
-    private String country_name;
-    @Column(name="country_iso",nullable = false)
-    private String country_city;
-    @Column(name="country_phone",nullable = false)
-    private String country_phone;
-    @Column(name="country_currency",nullable = false)
-    private String country_currency;
-    @Column(name="country_continent",nullable = false)
-    private String country_continent;
+    @Column(name="isoCode",nullable = false)
+    private String isoCode;
+    @Column(name="name",nullable = false)
+    private String name;
+    @Column(name="capitalCity",nullable = false)
+    private String capitalCity;
+    @Column(name="phoneCode",nullable = false)
+    private String phoneCode;
+    @Column(name="continentCode",nullable = false)
+    private String continentCode;
+    @Column(name="currencyCode",nullable = false)
+    private String currencyCode;
+    @Column(name="countryFlag",nullable = false)
+    private String countryFlag;
+
+
+
 }

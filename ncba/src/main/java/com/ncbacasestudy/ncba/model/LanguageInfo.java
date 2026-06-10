@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 @Table(
         name = "Language"
 )
-public class Language {
+public class LanguageInfo {
     @Id
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
     )
     private Long id;
-    @Column(name="language_code",nullable = false)
-    private String language_code;
-    @Column(name="language_name",nullable = false)
-    private String language_name;
+    @Column(name="languageCode",nullable = false)
+    private String languageCode;
+    @Column(name="languageName",nullable = false)
+    private String languageName;
 }

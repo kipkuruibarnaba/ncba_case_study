@@ -1,4 +1,10 @@
 package com.ncbacasestudy.ncba.service;
+import com.ncbacasestudy.ncba.model.CountryInfo;
+import com.ncbacasestudy.ncba.model.LanguageInfo;
+import com.ncbacasestudy.ncba.repository.CountryRepository;
+import com.ncbacasestudy.ncba.repository.LanguageRepository;
+import jakarta.transaction.Transactional;
+import org.json.JSONArray;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -19,9 +25,13 @@ import java.util.regex.Pattern;
 @Service
 public class CountryService {
     private final RestTemplate restTemplate;
+    private final CountryRepository countryRepository;
+    private final LanguageRepository languageRepository;
 
-    public CountryService(RestTemplate restTemplate) {
+    public CountryService(RestTemplate restTemplate, CountryRepository countryRepository, LanguageRepository languageRepository) {
         this.restTemplate = restTemplate;
+        this.countryRepository = countryRepository;
+        this.languageRepository = languageRepository;
     }
 
     public String getCountryInfo(String countryName) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
@@ -172,18 +182,49 @@ public class CountryService {
                 "//*[local-name()='tLanguage']/*[local-name()='sName']",
                 document);
 
-        System.out.println(isoCode);
-        System.out.println(countryName);
-        System.out.println(capitalCity);
-        System.out.println(phoneCode);
-        System.out.println(continentCode);
-        System.out.println(currencyCode);
-        System.out.println(flag);
-        System.out.println(languageCode);
-        System.out.println(languageName);
-        return xml;
+        JSONArray jsonArray = new JSONArray();
+
+        // Add primitive values
+        jsonArray.put(isoCode);
+        jsonArray.put(countryName);
+        jsonArray.put(capitalCity);
+        jsonArray.put(phoneCode);
+        jsonArray.put(continentCode);
+        jsonArray.put(currencyCode);
+        jsonArray.put(flag);
+        jsonArray.put(languageCode);
+        jsonArray.put(languageName);
+        insertToDb(jsonArray);
+
+        return jsonArray.toString();
     }
 
+    @Transactional
+    public Boolean insertToDb(JSONArray data){
+        System.out.println("DATA : "+data);
+        boolean created = false;
+        try {
+            CountryInfo countryInfo =new CountryInfo();
+            countryInfo.setIsoCode(data.getString(0));
+            countryInfo.setName(data.getString(1));
+            countryInfo.setCapitalCity(data.getString(2));
+            countryInfo.setPhoneCode(data.getString(3));
+            countryInfo.setContinentCode(data.getString(4));
+            countryInfo.setCurrencyCode(data.getString(5));
+            countryInfo.setCountryFlag(data.getString(6));
+            countryRepository.save(countryInfo);
+
+            LanguageInfo language = new LanguageInfo();
+            language.setLanguageCode(data.getString(7));
+            language.setLanguageName(data.getString(8));
+            languageRepository.save(language);
+            created =true;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return created;
+    };
 
 
 }

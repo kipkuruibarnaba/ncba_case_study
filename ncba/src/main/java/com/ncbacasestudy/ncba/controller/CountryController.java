@@ -17,9 +17,9 @@ import java.io.IOException;
 @RestController
 @RequestMapping("api/country")
 public class CountryController {
-    public CountryService countryService;
-    public CountryController(CountryService countryService) {
-        this.countryService = countryService;
+    public CountryService countryServiceImpl;
+    public CountryController(CountryService countryServiceImpl) {
+        this.countryServiceImpl = countryServiceImpl;
     }
     @PostMapping
     public ResponseEntity<String> receiveCountry(@RequestBody CountryReqDto req) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
@@ -30,7 +30,7 @@ public class CountryController {
         String sentenceCaseName = toSentenceCase(countryName);;
 
         String countryInfo =
-                countryService.getCountryInfo(sentenceCaseName);
+                countryServiceImpl.getCountryInfo(sentenceCaseName);
 
         return ResponseEntity.ok(countryInfo);
     }
