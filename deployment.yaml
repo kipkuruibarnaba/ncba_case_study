@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ncba-case-study
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ncba-case-study
+  template:
+    metadata:
+      labels:
+        app: ncba-case-study
+    spec:
+      containers:
+        - name: ncba-case-study
+          image: my-registry/ncba-case-study:1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
